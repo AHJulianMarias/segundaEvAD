@@ -62,11 +62,24 @@ public class Modelo {
 
 	}
 
-	private static ArrayList<Departamentos> modificarDpto(String localidad) {
-		String hql = "from Departamentos where loc='" + localidad + "'";
+	private static void modificarDpto(int idDpto, String nombreNew, String localidadNew) {
+
+		// String hql = "from Departamentos where loc='" + localidad + "'";
 		sesion = sf.openSession();
-		TypedQuery<Departamentos> tqDpto = sesion.createQuery(hql, Departamentos.class);
-		return (ArrayList<Departamentos>) tqDpto.getResultList();
+		Transaction t = sesion.beginTransaction();
+
+		Departamentos dpto = sesion.get(Departamentos.class, idDpto);
+		if (nombreNew != null) {
+
+			dpto.setDnombre(nombreNew);
+
+		}
+		if (localidadNew != null) {
+			dpto.setLoc(localidadNew);
+		}
+		sesion.merge(dpto);
+		t.commit();
+		sesion.close();
 
 	}
 
