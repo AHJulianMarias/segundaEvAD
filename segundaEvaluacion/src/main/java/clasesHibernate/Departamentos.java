@@ -55,4 +55,9 @@ public class Departamentos implements java.io.Serializable {
 		this.empleadoses = empleadoses;
 	}
 
+	@Override
+	public String toString() {
+		return "Departamentos [deptNo=" + deptNo + ", dnombre=" + dnombre + ", loc=" + loc + "]";
+	}
+
 }
