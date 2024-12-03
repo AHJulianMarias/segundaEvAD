@@ -1,6 +1,7 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
@@ -10,6 +11,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 import clasesHibernate.Departamentos;
+import clasesHibernate.Empleados;
 import jakarta.persistence.TypedQuery;
 
 public class Modelo {
@@ -23,10 +25,11 @@ public class Modelo {
 		// anadirEmpleado("Juan", "Perez", "García", "Enfermería");
 		// anadirDepartamento("Enfermeria", "Huelva");
 		// borrarDepartamento(44);
-		ArrayList<Departamentos> listadpto = listarDpto("Sevilla");
-		for (Departamentos a : listadpto) {
-			System.out.println(a.toString());
-		}
+//		ArrayList<Departamentos> listadpto = listarDpto("Sevilla");
+//		for (Departamentos a : listadpto) {
+//			System.out.println(a.toString());
+//		}
+		anadirEmpleado("Juan", "Manolo", "Jacinto", "Jardine");
 
 	}
 
@@ -83,9 +86,91 @@ public class Modelo {
 
 	}
 
+	/**
+	 * Comprobar que no existe un empleado con mismo nombre y apellidos, si es asi
+	 * no hace nada el metodo, si no tiene que comprobar si existe el departamento
+	 * 
+	 * 
+	 * Si el departamento no existe, lo creamos Si el departamento existe y hay
+	 * varios con el mismo nombre, los mostramos y pedimos al usuario que elija
+	 * entre ellos y se guarda el empleado Usar metodos externos para pedir datos
+	 * por ejemplo
+	 * 
+	 * 
+	 * @param nombre
+	 * @param ap1
+	 * @param ap2
+	 * @param dpto
+	 */
 	private static void anadirEmpleado(String nombre, String ap1, String ap2, String dpto) {
-		// TODO Auto-generated method stub
+		if (!comprobarExistenciaEmpleado(nombre, ap1, ap2)) {
+			Departamentos dptoObjeto = comprobarExistenciaDepartamento(dpto);
+			sesion = sf.openSession();
+			Transaction t = sesion.beginTransaction();
+			Empleados empleadoAnadir = new Empleados(dptoObjeto, nombre, ap1, ap2);
+			sesion.persist(empleadoAnadir);
+			t.commit();
+			sesion.close();
 
+		} else {
+			System.out.println("El empleado ya existe, por eso no se hizo nada");
+		}
+	}
+
+	private static boolean comprobarExistenciaEmpleado(String nombre, String ap1, String ap2) {
+		sesion = sf.openSession();
+		String hql = "from Empleados where nombre='" + nombre + "' and apellido1='" + ap1 + "' and apellido2='" + ap2
+				+ "'";
+		TypedQuery tqDptotq = sesion.createQuery(hql, Departamentos.class);
+		ArrayList<String> tqDpto = (ArrayList<String>) tqDptotq.getResultList();
+		if (tqDpto.size() == 0) {
+			sesion.close();
+			return false;
+		} else {
+			sesion.close();
+			return true;
+		}
+
+	}
+
+	private static Departamentos comprobarExistenciaDepartamento(String dpto) {
+		Scanner sc = new Scanner(System.in);
+		sesion = sf.openSession();
+		String elegirLocalidad = "Que localidad quieres elegir\n";
+		String hql = "from Departamentos where dnombre='" + dpto + "'";
+		TypedQuery tqDptoComprExis = sesion.createQuery(hql, Departamentos.class);
+		ArrayList<Departamentos> tqDpto = (ArrayList<Departamentos>) tqDptoComprExis.getResultList();
+		ArrayList<Departamentos> localidadesDptos = new ArrayList<Departamentos>();
+		for (Departamentos d : tqDpto) {
+			if (d.getDnombre().equalsIgnoreCase(dpto)) {
+				elegirLocalidad += d.getDnombre() + "\n";
+				localidadesDptos.add(d);
+			}
+
+		}
+
+		if (localidadesDptos.size() > 1) {
+			System.out.println(elegirLocalidad);
+			String localidad = sc.next();
+			for (Departamentos d : localidadesDptos) {
+				if (d.getLoc().equalsIgnoreCase(localidad)) {
+					return d;
+				}
+
+			}
+
+		} else if (localidadesDptos.size() == 1) {
+			for (Departamentos d : localidadesDptos) {
+				return d;
+			}
+		} else {
+			System.out.println("Elige a que localidad pertenece el departamento");
+			String localidad = sc.next();
+			anadirDepartamento(dpto, localidad);
+
+		}
+		comprobarExistenciaDepartamento(dpto);
+		return null;
 	}
 
 	private static void anadirDepartamento(String nombreDepartamento, String localidad) {
