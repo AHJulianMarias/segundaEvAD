@@ -29,7 +29,8 @@ public class Modelo {
 //		for (Departamentos a : listadpto) {
 //			System.out.println(a.toString());
 //		}
-		anadirEmpleado("Juan", "Manolo", "Jacinto", "Jardine");
+
+		anadirEmpleado("Juaa1a23an", "Maauiel", "Jacinto", "Jacinto");
 
 	}
 
@@ -37,7 +38,9 @@ public class Modelo {
 		String hql = "from Departamentos";
 		sesion = sf.openSession();
 		TypedQuery<Departamentos> tqDpto = sesion.createQuery(hql, Departamentos.class);
-		return (ArrayList<Departamentos>) tqDpto.getResultList();
+		ArrayList<Departamentos> arrayDpto = (ArrayList<Departamentos>) tqDpto.getResultList();
+		sesion.close();
+		return arrayDpto;
 
 	}
 
@@ -110,6 +113,11 @@ public class Modelo {
 			Empleados empleadoAnadir = new Empleados(dptoObjeto, nombre, ap1, ap2);
 			sesion.persist(empleadoAnadir);
 			t.commit();
+			if (comprobarExistenciaEmpleado(nombre, ap1, ap2)) {
+				System.out.println("Se ha añadido correctamente el empleado");
+			} else {
+				System.out.println("Error añadiendo el empleado");
+			}
 			sesion.close();
 
 		} else {
@@ -143,7 +151,7 @@ public class Modelo {
 		ArrayList<Departamentos> localidadesDptos = new ArrayList<Departamentos>();
 		for (Departamentos d : tqDpto) {
 			if (d.getDnombre().equalsIgnoreCase(dpto)) {
-				elegirLocalidad += d.getDnombre() + "\n";
+				elegirLocalidad += d.getLoc() + "\n";
 				localidadesDptos.add(d);
 			}
 
@@ -169,8 +177,8 @@ public class Modelo {
 			anadirDepartamento(dpto, localidad);
 
 		}
-		comprobarExistenciaDepartamento(dpto);
-		return null;
+		return comprobarExistenciaDepartamento(dpto);
+
 	}
 
 	private static void anadirDepartamento(String nombreDepartamento, String localidad) {
