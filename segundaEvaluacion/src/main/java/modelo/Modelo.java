@@ -141,12 +141,22 @@ public class Modelo {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	/**
+	 * Comprueba si existe el departamento y devuelve el objeto departamento
+	 * 
+	 * 
+	 * 
+	 * 
+	 * @param dpto
+	 * @return
+	 */
 	private static Departamentos comprobarExistenciaDepartamento(String dpto) {
 		Scanner sc = new Scanner(System.in);
 		sesion = sf.openSession();
 		String elegirLocalidad = "Que localidad quieres elegir\n";
 		String hql = "from Departamentos where dnombre='" + dpto + "'";
-		TypedQuery tqDptoComprExis = sesion.createQuery(hql, Departamentos.class);
+		TypedQuery<?> tqDptoComprExis = sesion.createQuery(hql, Departamentos.class);
 		ArrayList<Departamentos> tqDpto = (ArrayList<Departamentos>) tqDptoComprExis.getResultList();
 		ArrayList<Departamentos> localidadesDptos = new ArrayList<Departamentos>();
 		for (Departamentos d : tqDpto) {
